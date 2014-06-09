@@ -1,0 +1,9 @@
+
+# on Ubuntu 13.04 x64
+
+# get system deps
+apt-get install python-lxml zlib1g-dev
+
+# get py deps
+# under a virtualenv
+pip install stix 
