@@ -25,18 +25,6 @@ stix_package.stix_header = stix_header
 
 
 
-# create threat actor info
-actor = ThreatActor()
-actor.title = "Ajax Team"
-actor.description = "Iranian intrusion team"
-actor.add_motivation ("Political")
-actor.add_motivation ("Military")
-actor.add_sophistication ("Practitioner")
-actor.add_intended_effect ("Advantage - Political")
-actor.observed_ttps = ObservedTTPs("pants")
-
-stix_package.add_threat_actor(actor)
-
 # add TTP for phish
 phishing = TTP()
 phishing.title = 'Phishing Attempt'
@@ -52,6 +40,20 @@ malware.description = 'Customized trojan written in .NET'
 malware.intended_effects = 'Account Takeover'
 
 stix_package.add_ttp(malware)
+
+# create threat actor info
+actor = ThreatActor()
+actor.title = "Ajax Team"
+actor.description = "Iranian intrusion team"
+actor.add_motivation ("Political")
+actor.add_motivation ("Military")
+actor.add_sophistication ("Practitioner")
+actor.add_intended_effect ("Advantage - Political")
+actor.observed_ttps = ObservedTTPs(TTP(idref=phishing.id_))
+actor.observed_ttps = ObservedTTPs(TTP(idref=malware.id_))
+
+stix_package.add_threat_actor(actor)
+
 # add email indicator
 email_ind = Indicator()
 email_ind.title = "Phishing email"
@@ -99,13 +101,13 @@ malware_ind.title = "Malware used by actors"
 malware_ind.description = "Remote access trojan \"Stealer\""
 malware_ind.set_producer_identity("FireEye")
 malware_ind.set_produced_time(datetime.strptime('2014-05-15', "%Y-%m-%d"))
-
 # add malware sample object
 sample = File()
 sample.add_hash ( Hash('6dc7cc33a3cdcfee6c4edb6c085b869d'))
 sample.file_extension = '.exe'
 sample.file_name = 'IntelRS.exe' 
 sample.file_path = 'C:\Documents and Settings{USER}\Application Data\IntelRapidStart\AppTransferWiz.dll'
+sample.add_related(ip,"Related_To")
 malware_ind.add_object(sample)
 
 stix_package.add_indicator(malware_ind)
