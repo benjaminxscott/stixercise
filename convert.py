@@ -2,9 +2,10 @@
 
 import csv
 from datetime import datetime
-from dateutil.tz import tzutc
 from stix.indicator import Indicator
 from stix.core import STIXPackage, STIXHeader
+from stix.common import InformationSource
+from cybox.common import Time
 from stix.ttp import TTP
 
 from stix.threat_actor import ThreatActor, ObservedTTPs
@@ -19,11 +20,15 @@ from cybox.objects.file_object import File
 # setup stix document
 stix_package = STIXPackage()
 stix_header = STIXHeader()
-stix_header.description = "Encapsulation of indicators for FireEye report on Saffron"
+
+stix_header.description = "Indicators for FireEye report on Saffron"
 stix_header.add_package_intent ("Threat Report")
+
+stix_header.information_source = InformationSource()
+stix_header.information_source.time = Time()
+stix_header.information_source.time.produced_time = datetime.strptime('2014-05-15', "%Y-%m-%d")
+
 stix_package.stix_header = stix_header
-
-
 
 # add TTP for phish
 phishing = TTP()
@@ -101,6 +106,7 @@ malware_ind.title = "Malware used by actors"
 malware_ind.description = "Remote access trojan \"Stealer\""
 malware_ind.set_producer_identity("FireEye")
 malware_ind.set_produced_time(datetime.strptime('2014-05-15', "%Y-%m-%d"))
+
 # add malware sample object
 sample = File()
 sample.add_hash ( Hash('6dc7cc33a3cdcfee6c4edb6c085b869d'))
