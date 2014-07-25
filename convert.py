@@ -3,14 +3,18 @@
 import csv
 from datetime import datetime
 from stix.indicator import Indicator
+from stix.indicator.sightings import Sightings, Sighting
 from stix.core import STIXPackage, STIXHeader
 from stix.common import InformationSource
-from cybox.common import Time
-from stix.ttp import TTP
+from stix.common import Confidence
 
-from stix.threat_actor import ThreatActor, ObservedTTPs
+from stix.ttp import TTP
+from stix.threat_actor import ThreatActor
+
+from stix.common.related import RelatedTTP
 
 from cybox.common import Hash
+from cybox.common import Time
 from cybox.objects.email_message_object import EmailMessage
 from cybox.objects.domain_name_object import DomainName
 from cybox.objects.address_object import Address
@@ -54,8 +58,9 @@ actor.add_motivation ("Political")
 actor.add_motivation ("Military")
 actor.add_sophistication ("Practitioner")
 actor.add_intended_effect ("Advantage - Political")
-actor.observed_ttps = ObservedTTPs(TTP(idref=phishing.id_))
-actor.observed_ttps = ObservedTTPs(TTP(idref=malware.id_))
+actor.observed_ttps.append(RelatedTTP(item=TTP(idref=phishing.id_)))
+actor.observed_ttps.append(RelatedTTP(item=TTP(idref=malware.id_)))
+actor.confidence = Confidence("Medium")
 
 stix_package.add_threat_actor(actor)
 
@@ -73,8 +78,8 @@ eml.sender = "invite@aeroconf2014.org"
 eml.subject = "IEEE Aerospace Conference 2014"
 
 email_ind.add_object(eml)
-stix_package.add_indicator(email_ind)
 
+stix_package.add_indicator(email_ind)
 
 # add control server indicator
 control_ind = Indicator()
@@ -94,6 +99,7 @@ control_ind.add_object(domain)
 ip = Address()
 ip.category = ip.CAT_IPV4
 ip.address_value = '81.17.28.227'
+ip.address_value.condition= "Equals"
 
 control_ind.add_object(ip)
 
@@ -112,6 +118,7 @@ sample = File()
 sample.add_hash ( Hash('6dc7cc33a3cdcfee6c4edb6c085b869d'))
 sample.file_extension = '.exe'
 sample.file_name = 'IntelRS.exe' 
+sample.condition = "Equals"
 sample.file_path = 'C:\Documents and Settings{USER}\Application Data\IntelRapidStart\AppTransferWiz.dll'
 sample.add_related(ip,"Related_To")
 malware_ind.add_object(sample)
